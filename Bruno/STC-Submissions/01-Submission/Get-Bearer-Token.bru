@@ -25,10 +25,16 @@ body:json {
 }
 
 script:post-response {
-  const token = res.getHeader("Authorization");
-  if (token) {
-    bru.setEnvVar("bearerToken", token.replace("Bearer ", ""));
-    console.log("Bearer token saved to environment");
+  const authHeader = res.getHeader("Authorization");
+  if (authHeader) {
+    const bearerPart = authHeader.split(",").find(p => p.trim().startsWith("Bearer "));
+    if (bearerPart) {
+      const token = bearerPart.trim().replace("Bearer ", "");
+      bru.setEnvVar("bearerToken", token);
+      console.log("Bearer token saved to environment");
+    } else {
+      console.log("No Bearer token found in Authorization header:", authHeader);
+    }
   } else {
     console.log("No Authorization header in response");
   }

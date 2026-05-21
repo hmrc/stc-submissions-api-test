@@ -1,0 +1,101 @@
+meta {
+  name: Submission 400 Duplicate RecordIds
+  type: http
+  seq: 5
+}
+
+post {
+  url: {{baseUrl}}{{basePath}}/submission/{{submissionId}}
+  body: json
+  auth: inherit
+}
+
+headers {
+  Authorization: Bearer {{bearerToken}}
+  correlation-id: {{correlationId}}
+  subscription-id: {{subscriptionId}}
+}
+
+body:json {
+  {
+    "declaration": {
+      "role1": "1",
+      "name": "Declarant Name",
+      "addr1": "123 Main Street",
+      "postcode": "AB12CD",
+      "country": "GB",
+      "isCorrectInfo": true
+    },
+    "transfers": [
+      {
+        "recordId": 1,
+        "transactionDetails": {
+          "transactionType": 1,
+          "typeOfSecurity": "Ordinary Shares",
+          "numberOfShares": 100,
+          "originalChargingPoint": "2026-01-15",
+          "considerationActual": 5000,
+          "isConnectedPartiesTransactions": false,
+          "companyName": "Test Corporation"
+        },
+        "mainSellerDetails": {
+          "sellerName": "Seller Name",
+          "addr1": "100 Seller Lane",
+          "postcode": "AB12CD",
+          "country": "GB"
+        },
+        "mainBuyerDetails": {
+          "buyerName": "Buyer Name",
+          "addr1": "50 Buyer Road",
+          "postcode": "AB12CD",
+          "country": "GB",
+          "email": "buyer@example.com",
+          "taxRate": 1
+        }
+      },
+      {
+        "recordId": 1,
+        "transactionDetails": {
+          "transactionType": 2,
+          "typeOfSecurity": "Preference Shares",
+          "numberOfShares": 200,
+          "originalChargingPoint": "2026-02-20",
+          "considerationActual": 10000,
+          "isConnectedPartiesTransactions": false,
+          "companyName": "Another Corporation"
+        },
+        "mainSellerDetails": {
+          "sellerName": "Another Seller",
+          "addr1": "200 Seller Street",
+          "postcode": "CD34EF",
+          "country": "GB"
+        },
+        "mainBuyerDetails": {
+          "buyerName": "Another Buyer",
+          "addr1": "75 Buyer Avenue",
+          "postcode": "EF56GH",
+          "country": "GB",
+          "email": "another.buyer@example.com",
+          "taxRate": 2
+        }
+      }
+    ]
+  }
+}
+
+tests {
+  test("Status code is 400", function () {
+    expect(res.getStatus()).to.equal(400);
+  });
+
+  test("Response contains duplicate recordIds error", function () {
+    const body = res.getBody();
+    expect(body.error).to.equal("invalid transfer data");
+    expect(body.details[0].message).to.equal("recordIds must be unique");
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

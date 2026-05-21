@@ -1,0 +1,38 @@
+meta {
+  name: 01-Submission
+  seq: 1
+}
+
+auth {
+  mode: inherit
+}
+
+script:pre-request {
+  const axios = require("axios");
+  const response = await axios.post("http://localhost:8585/government-gateway/session/login",
+  {
+    "credId": "test-cred-id",
+    "affinityGroup": "Individual",
+    "confidenceLevel": 50,
+    "credentialStrength": "strong",
+    "enrolments": [
+      {
+        "key": "HMRC-STC-ORG",
+        "identifiers": [
+          {
+            "key": "STCID",
+            "value": "STC0123456789"
+          }
+        ],
+        "state": "Activated"
+      }
+    ]
+  });
+  const authHeader = response.headers["authorization"];
+  if (authHeader) {
+    const bearerPart = authHeader.split(",").find(p => p.trim().startsWith("Bearer "));
+    if (bearerPart) {
+      bru.setEnvVar("bearerToken", bearerPart.trim().replace("Bearer ", ""));
+    }
+  }
+}

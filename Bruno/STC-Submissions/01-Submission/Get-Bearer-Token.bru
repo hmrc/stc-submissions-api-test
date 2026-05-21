@@ -1,0 +1,57 @@
+meta {
+  name: Get Bearer Token
+  type: http
+  seq: 0
+}
+
+post {
+  url: http://localhost:8585/government-gateway/session/login
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "credId": "test-cred-id",
+    "affinityGroup": "Individual",
+    "confidenceLevel": 50,
+    "credentialStrength": "strong",
+    "enrolments": [
+      {
+        "key": "HMRC-STC-ORG",
+        "identifiers": [
+          {
+            "key": "STCID",
+            "value": "STC0123456789"
+          }
+        ],
+        "state": "Activated"
+      }
+    ]
+  }
+}
+
+script:post-response {
+  const authHeader = res.getHeader("Authorization");
+  if (authHeader) {
+    const bearerPart = authHeader.split(",").find(p => p.trim().startsWith("Bearer "));
+    if (bearerPart) {
+      const token = bearerPart.trim().replace("Bearer ", "");
+      bru.setEnvVar("bearerToken", token);
+      console.log("Bearer token saved to environment");
+    } else {
+      console.log("No Bearer token found in Authorization header:", authHeader);
+    }
+  } else {
+    console.log("No Authorization header in response");
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

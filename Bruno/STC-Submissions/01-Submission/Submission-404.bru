@@ -1,0 +1,38 @@
+meta {
+  name: Submission 404
+  type: http
+  seq: 7
+}
+
+post {
+  url: {{baseUrl}}{{basePath}}/invalid-path
+  body: json
+  auth: inherit
+}
+
+headers {
+  Authorization: Bearer {{bearerToken}}
+  correlation-id: {{correlationId}}
+  subscription-id: {{subscriptionId}}
+}
+
+body:json {
+  {}
+}
+
+tests {
+  test("Status code is 404", function () {
+    expect(res.getStatus()).to.equal(404);
+  });
+
+  test("Response contains URI not found message", function () {
+    const body = res.getBody();
+    expect(body.statusCode).to.equal(404);
+    expect(body.message).to.equal("URI not found");
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

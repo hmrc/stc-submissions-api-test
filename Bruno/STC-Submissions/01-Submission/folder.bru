@@ -9,12 +9,24 @@ auth {
 
 script:pre-request {
   const axios = require("axios");
-  const response = await axios.post("http://localhost:8585/government-gateway/session/login", {
-    credId: "test-cred-id",
-    affinityGroup: "Individual",
-    confidenceLevel: 50,
-    credentialStrength: "strong",
-    enrolments: []
+  const response = await axios.post("http://localhost:8585/government-gateway/session/login",
+  {
+    "credId": "test-cred-id",
+    "affinityGroup": "Individual",
+    "confidenceLevel": 50,
+    "credentialStrength": "strong",
+    "enrolments": [
+      {
+        "key": "HMRC-STC-ORG",
+        "identifiers": [
+          {
+            "key": "STCID",
+            "value": "STC0123456789"
+          }
+        ],
+        "state": "Activated"
+      }
+    ]
   });
   const authHeader = response.headers["authorization"];
   if (authHeader) {

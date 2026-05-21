@@ -1,0 +1,73 @@
+meta {
+  name: Submission 400 Missing Headers
+  type: http
+  seq: 4
+}
+
+post {
+  url: {{baseUrl}}{{basePath}}/submission/{{submissionId}}
+  body: json
+  auth: inherit
+}
+
+headers {
+  Authorization: Bearer {{bearerToken}}
+}
+
+body:json {
+  {
+    "declaration": {
+      "role1": "1",
+      "name": "Declarant Name",
+      "addr1": "123 Main Street",
+      "postcode": "AB12CD",
+      "country": "GB",
+      "isCorrectInfo": true
+    },
+    "transfers": [
+      {
+        "recordId": 1,
+        "transactionDetails": {
+          "transactionType": 1,
+          "typeOfSecurity": "Ordinary Shares",
+          "numberOfShares": 100,
+          "originalChargingPoint": "2026-01-15",
+          "considerationActual": 5000,
+          "isConnectedPartiesTransactions": false,
+          "companyName": "Test Corporation"
+        },
+        "mainSellerDetails": {
+          "sellerName": "Seller Name",
+          "addr1": "100 Seller Lane",
+          "postcode": "AB12CD",
+          "country": "GB"
+        },
+        "mainBuyerDetails": {
+          "buyerName": "Buyer Name",
+          "addr1": "50 Buyer Road",
+          "postcode": "AB12CD",
+          "country": "GB",
+          "email": "buyer@example.com",
+          "taxRate": 1
+        }
+      }
+    ]
+  }
+}
+
+tests {
+  test("Status code is 400", function () {
+    expect(res.getStatus()).to.equal(400);
+  });
+
+  test("Response contains missing headers error", function () {
+    const body = res.getBody();
+    expect(body.error).to.equal("invalid transfer data");
+    expect(body.details[0].message).to.equal("missing required headers: correlation-id and subscription-id");
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

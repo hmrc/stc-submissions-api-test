@@ -1,0 +1,74 @@
+meta {
+  name: Submission 400 Invalid Json
+  type: http
+  seq: 6
+}
+
+post {
+  url: {{baseUrl}}{{basePath}}/submission/{{submissionId}}
+  body: json
+  auth: inherit
+}
+
+headers {
+  Authorization: Bearer {{bearerToken}}
+  correlation-id: {{correlationId}}
+  subscription-id: {{subscriptionId}}
+}
+
+body:json {
+  {
+    "declaration": {
+      "role1": "1",
+      "addr1": "123 Main Street",
+      "postcode": "AB12CD",
+      "country": "GB",
+      "isCorrectInfo": true
+    },
+    "transfers": [
+      {
+        "recordId": 1,
+        "transactionDetails": {
+          "transactionType": 1,
+          "typeOfSecurity": "Ordinary Shares",
+          "numberOfShares": 100,
+          "originalChargingPoint": "2026-01-15",
+          "considerationActual": 5000,
+          "isConnectedPartiesTransactions": false,
+          "companyName": "Test Corporation"
+        },
+        "mainSellerDetails": {
+          "sellerName": "Seller Name",
+          "addr1": "100 Seller Lane",
+          "postcode": "AB12CD",
+          "country": "GB"
+        },
+        "mainBuyerDetails": {
+          "buyerName": "Buyer Name",
+          "addr1": "50 Buyer Road",
+          "postcode": "AB12CD",
+          "country": "GB",
+          "email": "buyer@example.com",
+          "taxRate": 1
+        }
+      }
+    ]
+  }
+}
+
+tests {
+  test("Status code is 400", function () {
+    expect(res.getStatus()).to.equal(400);
+  });
+
+  test("Response contains JSON validation error", function () {
+    const body = res.getBody();
+    expect(body.error).to.equal("invalid transfer data");
+    expect(body.details).to.be.an("array");
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

@@ -1,0 +1,77 @@
+meta {
+  name: Submission 200
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{baseUrl}}{{basePath}}/submission/{{submissionId}}
+  body: json
+  auth: inherit
+}
+
+headers {
+  Authorization: Bearer {{bearerToken}}
+  correlation-id: {{correlationId}}
+  subscription-id: {{subscriptionId}}
+}
+
+body:json {
+  {
+    "declaration": {
+      "role1": "1",
+      "name": "Declarant Name",
+      "addr1": "123 Main Street",
+      "postcode": "AB12CD",
+      "country": "GB",
+      "isCorrectInfo": true
+    },
+    "transfers": [
+      {
+        "recordId": 1,
+        "transactionDetails": {
+          "transactionType": 1,
+          "typeOfSecurity": "Ordinary Shares",
+          "numberOfShares": 100,
+          "originalChargingPoint": "2026-01-15",
+          "considerationActual": 5000,
+          "isConnectedPartiesTransactions": false,
+          "companyName": "Test Corporation"
+        },
+        "mainSellerDetails": {
+          "sellerName": "Seller Name",
+          "addr1": "100 Seller Lane",
+          "postcode": "AB12CD",
+          "country": "GB"
+        },
+        "mainBuyerDetails": {
+          "buyerName": "Buyer Name",
+          "addr1": "50 Buyer Road",
+          "postcode": "AB12CD",
+          "country": "GB",
+          "email": "buyer@example.com",
+          "taxRate": 1
+        }
+      }
+    ]
+  }
+}
+
+tests {
+  test("Status code is 200", function () {
+    expect(res.getStatus()).to.equal(200);
+  });
+
+  test("Response contains charge results", function () {
+    const body = res.getBody();
+    expect(body).to.be.an("array");
+    expect(body[0].recordId).to.equal(1);
+    expect(body[0].utrn).to.exist;
+    expect(body[0].chargeAmount).to.exist;
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

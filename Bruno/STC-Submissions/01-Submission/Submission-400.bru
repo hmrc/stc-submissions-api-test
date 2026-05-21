@@ -1,0 +1,48 @@
+meta {
+  name: Submission 400
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{baseUrl}}{{basePath}}/submission/{{submissionId}}
+  body: json
+  auth: inherit
+}
+
+headers {
+  Authorization: Bearer {{bearerToken}}
+  correlation-id: {{correlationId}}
+  subscription-id: {{subscriptionId}}
+}
+
+body:json {
+  {
+    "declaration": {
+      "role1": "1",
+      "name": "Declarant Name",
+      "addr1": "123 Main Street",
+      "postcode": "AB12CD",
+      "country": "GB",
+      "isCorrectInfo": true
+    },
+    "transfers": []
+  }
+}
+
+tests {
+  test("Status code is 400", function () {
+    expect(res.getStatus()).to.equal(400);
+  });
+
+  test("Response contains error details", function () {
+    const body = res.getBody();
+    expect(body.error).to.exist;
+    expect(body.details).to.be.an("array");
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

@@ -1,0 +1,40 @@
+meta {
+  name: Get Bearer Token
+  type: http
+  seq: 0
+}
+
+post {
+  url: http://localhost:8585/government-gateway/session/login
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "credId": "test-cred-id",
+    "affinityGroup": "Individual",
+    "confidenceLevel": 50,
+    "credentialStrength": "strong",
+    "enrolments": []
+  }
+}
+
+script:post-response {
+  const token = res.getHeader("Authorization");
+  if (token) {
+    bru.setEnvVar("bearerToken", token.replace("Bearer ", ""));
+    console.log("Bearer token saved to environment");
+  } else {
+    console.log("No Authorization header in response");
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

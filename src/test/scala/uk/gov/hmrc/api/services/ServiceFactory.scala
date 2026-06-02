@@ -33,40 +33,9 @@ class ServiceFactory @Inject() (client: HttpClientV2)(implicit ec: ExecutionCont
 
   private val submissionsBaseUrl: String = TestEnvironment.url("stcSubmissions")
   private val submissionsApiBase: String = TestEnvironment.url("stcSubmissionsBase")
-  private val authUrl: String            = TestEnvironment.url("authStub")
+  private val authService: AuthService   = new AuthService(client)
 
-  private val authPayload: JsValue = Json.parse(
-    """{
-      |  "credId": "test-cred-id",
-      |  "affinityGroup": "Individual",
-      |  "confidenceLevel": 50,
-      |  "credentialStrength": "strong",
-      |  "enrolments": [
-      |    {
-      |      "key": "HMRC-STC-ORG",
-      |      "identifiers": [{ "key": "STCID", "value": "STC0123456789" }],
-      |      "state": "Activated"
-      |    }
-      |  ]
-      |}""".stripMargin
-  )
-
-  def getBearerToken: Future[String] = {
-    implicit val hc: HeaderCarrier = HeaderCarrier()
-    log.info(s"Fetching bearer token from $authUrl")
-    client
-      .post(URI.create(authUrl).toURL)
-      .withBody(authPayload)
-      .execute[HttpResponse]
-      .map { response =>
-        response.headers
-          .find { case (k, _) => k.equalsIgnoreCase("Authorization") }
-          .flatMap { case (_, values) => values.headOption }
-          .flatMap(_.split(",").find(_.trim.startsWith("Bearer ")))
-          .map(_.trim.replace("Bearer ", ""))
-          .getOrElse(throw new RuntimeException(s"No Bearer token in auth stub response (status: ${response.status})"))
-      }
-  }
+  def getBearerToken: Future[String] = authService.getBearerToken()
 
   def postSubmission(
     submissionId: String,
@@ -74,12 +43,12 @@ class ServiceFactory @Inject() (client: HttpClientV2)(implicit ec: ExecutionCont
     bearerToken: String,
     subscriptionId: String = "sub-id-001"
   ): Future[HttpResponse] = {
-    val correlationId = UUID.randomUUID().toString
-    val url           = s"$submissionsBaseUrl/$submissionId"
+    val correlationId              = UUID.randomUUID().toString
+    val url                        = s"$submissionsBaseUrl/$submissionId"
     log.info(s"POST $url with correlation-id: $correlationId")
     implicit val hc: HeaderCarrier = HeaderCarrier(
       authorization = Some(Authorization(s"Bearer $bearerToken")),
-      extraHeaders  = Seq(
+      extraHeaders = Seq(
         "correlation-id"  -> correlationId,
         "subscription-id" -> subscriptionId
       )
@@ -95,7 +64,7 @@ class ServiceFactory @Inject() (client: HttpClientV2)(implicit ec: ExecutionCont
     payload: JsValue,
     bearerToken: String
   ): Future[HttpResponse] = {
-    val url = s"$submissionsBaseUrl/$submissionId"
+    val url                        = s"$submissionsBaseUrl/$submissionId"
     log.info(s"POST $url (no required headers)")
     implicit val hc: HeaderCarrier = HeaderCarrier(
       authorization = Some(Authorization(s"Bearer $bearerToken"))
@@ -107,12 +76,12 @@ class ServiceFactory @Inject() (client: HttpClientV2)(implicit ec: ExecutionCont
   }
 
   def postToInvalidPath(bearerToken: String): Future[HttpResponse] = {
-    val url           = s"$submissionsApiBase/invalid-path"
-    val correlationId = UUID.randomUUID().toString
+    val url                        = s"$submissionsApiBase/invalid-path"
+    val correlationId              = UUID.randomUUID().toString
     log.info(s"POST $url")
     implicit val hc: HeaderCarrier = HeaderCarrier(
       authorization = Some(Authorization(s"Bearer $bearerToken")),
-      extraHeaders  = Seq(
+      extraHeaders = Seq(
         "correlation-id"  -> correlationId,
         "subscription-id" -> "sub-id-001"
       )

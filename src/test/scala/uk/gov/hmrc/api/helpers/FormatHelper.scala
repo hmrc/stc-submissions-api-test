@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 HM Revenue & Customs
+ * Copyright 2026 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.api.specs
+package uk.gov.hmrc.api.helpers
 
-import org.scalatest.featurespec.AnyFeatureSpec
-import org.scalatest.matchers.should.Matchers
-import org.scalatest.GivenWhenThen
+trait FormatHelper {
 
-trait BaseSpec extends AnyFeatureSpec with GivenWhenThen with Matchers {}
+  def checkResponseStatus(status: Int, expected: Int): Unit =
+    assert(status == expected, s"Expected status $expected but got $status")
+}

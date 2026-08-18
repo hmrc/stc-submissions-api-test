@@ -1,8 +1,7 @@
-**This is the template README. Please update this with project specific content.**
 
 # stc-submissions-api-test
 
-<SERVICE_NAME> API tests.
+securities transfer charge API tests.
 
 ## Pre-requisites
 
@@ -14,10 +13,10 @@ Start Mongo Docker container as follows:
 docker run --rm -d -p 27017:27017 --name mongo percona/percona-server-mongodb:6.0
 ```
 
-Start `<SERVICE_MANAGER_PROFILE>` services as follows:
+Start `STAMP_TAXES_ON_SHARES_ALL` services as follows:
 
 ```bash
-sm2 --start <SERVICE_MANAGER_PROFILE>
+sm2 --start STAMP_TAXES_ON_SHARES_ALL
 ```
 
 ## Tests
@@ -27,7 +26,7 @@ Run tests as follows:
 * Argument `<environment>` must be `local`, `dev`, `qa` or `staging`.
 
 ```bash
-./run-tests.sh <environment>
+sbt clean -Denvironment="<environment>" test testReport
 ```
 
 ## Scalafmt

@@ -95,8 +95,8 @@ class SubmissionSpec extends BaseSpec with BeforeAndAfterAll {
 
     val testCases = Table(
       ("description", "request", "expectedStatus"),
-      ("Success - Single transfer", () => service.postSubmission("sub-001", singleTransfer, bearerToken), 200),
-      ("Success - Multiple transfers", () => service.postSubmission("sub-002", multipleTransfers, bearerToken), 200),
+      ("Success - Single transfer", () => service.postSubmission("sub-001", singleTransfer, bearerToken), 201),
+      ("Success - Multiple transfers", () => service.postSubmission("sub-002", multipleTransfers, bearerToken), 201),
       ("Error - Empty transfers array", () => service.postSubmission("sub-001", emptyTransfers, bearerToken), 400),
       ("Error - Duplicate recordIds", () => service.postSubmission("sub-001", duplicateRecordIds, bearerToken), 400),
       ("Error - Invalid JSON", () => service.postSubmission("sub-001", missingDeclarationName, bearerToken), 400),

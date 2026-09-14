@@ -46,6 +46,7 @@ class ServiceFactory @Inject() (client: HttpClientV2)(implicit ec: ExecutionCont
     val correlationId              = UUID.randomUUID().toString
     val url                        = s"$submissionsBaseUrl/$submissionId"
     log.info(s"POST $url with correlation-id: $correlationId")
+    println("hello sathya")
     implicit val hc: HeaderCarrier = HeaderCarrier(
       authorization = Some(Authorization(s"Bearer $bearerToken")),
       extraHeaders = Seq(
@@ -66,6 +67,7 @@ class ServiceFactory @Inject() (client: HttpClientV2)(implicit ec: ExecutionCont
   ): Future[HttpResponse] = {
     val url                        = s"$submissionsBaseUrl/$submissionId"
     log.info(s"POST $url (no required headers)")
+    println("print please")
     implicit val hc: HeaderCarrier = HeaderCarrier(
       authorization = Some(Authorization(s"Bearer $bearerToken"))
     )

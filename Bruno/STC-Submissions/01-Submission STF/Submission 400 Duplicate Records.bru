@@ -1,7 +1,7 @@
 meta {
-  name: Submission 400 Missing Headers
+  name: Submission 400 Duplicate Records
   type: http
-  seq: 4
+  seq: 5
 }
 
 post {
@@ -12,6 +12,8 @@ post {
 
 headers {
   Authorization: Bearer {{bearerToken}}
+  correlation-id: {{correlationId}}
+  subscription-id: {{subscriptionId}}
 }
 
 body:json {
@@ -50,6 +52,32 @@ body:json {
           "email": "buyer@example.com",
           "taxRate": 1
         }
+      },
+      {
+        "recordId": 1,
+        "transactionDetails": {
+          "transactionType": 2,
+          "typeOfSecurity": "Preference Shares",
+          "numberOfShares": 200,
+          "originalChargingPoint": "2026-02-20",
+          "considerationActual": 10000,
+          "isConnectedPartiesTransactions": false,
+          "companyName": "Another Corporation"
+        },
+        "mainSellerDetails": {
+          "sellerName": "Another Seller",
+          "addr1": "200 Seller Street",
+          "postcode": "CD34EF",
+          "country": "GB"
+        },
+        "mainBuyerDetails": {
+          "buyerName": "Another Buyer",
+          "addr1": "75 Buyer Avenue",
+          "postcode": "EF56GH",
+          "country": "GB",
+          "email": "another.buyer@example.com",
+          "taxRate": 2
+        }
       }
     ]
   }
@@ -59,11 +87,11 @@ tests {
   test("Status code is 400", function () {
     expect(res.getStatus()).to.equal(400);
   });
-
-  test("Response contains missing headers error", function () {
+  
+  test("Response contains duplicate recordIds error", function () {
     const body = res.getBody();
     expect(body.error).to.equal("invalid transfer data");
-    expect(body.details[0].message).to.equal("missing required headers: correlation-id and subscription-id");
+    expect(body.details[0].message).to.equal("recordIds must be unique");
   });
 }
 

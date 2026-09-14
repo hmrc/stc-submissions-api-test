@@ -1,7 +1,7 @@
 meta {
-  name: Submission 200
+  name: Submission 200 Multi
   type: http
-  seq: 1
+  seq: 2
 }
 
 post {
@@ -52,22 +52,56 @@ body:json {
           "email": "buyer@example.com",
           "taxRate": 1
         }
+      },
+      {
+        "recordId": 2,
+        "transactionDetails": {
+          "transactionType": 2,
+          "typeOfSecurity": "Preference Shares",
+          "numberOfShares": 200,
+          "originalChargingPoint": "2026-02-20",
+          "considerationActual": 10000,
+          "isConnectedPartiesTransactions": true,
+          "companyName": "Another Corporation"
+        },
+        "mainSellerDetails": {
+          "sellerName": "Another Seller",
+          "addr1": "200 Seller Street",
+          "postcode": "CD34EF",
+          "country": "GB"
+        },
+        "mainBuyerDetails": {
+          "buyerName": "Another Buyer",
+          "addr1": "75 Buyer Avenue",
+          "postcode": "EF56GH",
+          "country": "GB",
+          "email": "another.buyer@example.com",
+          "taxRate": 2
+        }
       }
     ]
   }
 }
 
 tests {
-  test("Status code is 200", function () {
-    expect(res.getStatus()).to.equal(200);
+  test("Status code is 201", function () {
+    expect(res.getStatus()).to.equal(201);
   });
-
+  
   test("Response contains charge results", function () {
     const body = res.getBody();
-    expect(body).to.be.an("array");
-    expect(body[0].recordId).to.equal(1);
-    expect(body[0].utrn).to.exist;
-    expect(body[0].chargeAmount).to.exist;
+    const success = body.success;
+    const charges = success.charges;
+  
+    expect(success).to.be.an("object");
+    expect(success.processingDate).to.exist;
+  
+    expect(charges).to.be.an("array");
+    expect(charges).to.have.length.greaterThan(0);
+  
+    expect(charges[0].recordId).to.equal(1);
+    expect(charges[0].utrn).to.exist;
+    expect(charges[0].chargeAmount).to.exist;
   });
 }
 

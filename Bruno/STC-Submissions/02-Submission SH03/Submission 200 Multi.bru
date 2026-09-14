@@ -1,0 +1,140 @@
+meta {
+  name: Submission 200 Multi
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{baseUrl}}{{basePath}}/submission/{{submissionId}}
+  body: json
+  auth: inherit
+}
+
+headers {
+  Authorization: Bearer {{bearerToken}}
+  correlation-id: {{correlationId}}
+  subscription-id: {{subscriptionId}}
+}
+
+body:json {
+  {
+    "declaration": {
+      "role1": "1",
+      "role2": "On behalf of client",
+      "name": "John Smith",
+      "addr1": "123 High Street",
+      "addr2": "Suite 4",
+      "addr3": "Leeds",
+      "postcode": "LS1 1AA",
+      "country": "GB",
+      "selfDeclarationAgent": true,
+      "isCorrectInfo": true
+    },
+    "transfers": [
+      {
+        "recordId": 1,
+        "transactionDetails": {
+          "transactionType": 1,
+          "reasonForPurchase": 1,
+          "typeOfSecurity": "Ordinary Shares",
+          "numberOfShares": 1000,
+          "nominalValue": 1.0,
+          "marketValue": 1500.00,
+          "qualifyAsTreasuryShares": false,
+          "maxPricePaid": 1.75,
+          "minPricePaid": 1.25,
+          "originalChargingPoint": "2026-04-01",
+          "considerationActual": 1500.00,
+          "isConnectedPartiesTransactions": false,
+          "companyName": "ABC Holdings Ltd",
+          "companyRegistrationNumber": "12345678",
+          "reliefClaimedName": "Some relief",
+          "reliefPercentage": 100
+        },
+        "mainSellerDetails": {
+          "sellerName": "Jane Doe",
+          "addr1": "45 Market Street",
+          "addr3": "Manchester",
+          "postcode": "M1 2AB",
+          "country": "GB"
+        },
+        "mainBuyerDetails": {
+          "buyerName": "XYZ Investments Ltd",
+          "addr1": "78 King Road",
+          "addr3": "London",
+          "postcode": "EC1A 1BB",
+          "country": "GB",
+          "email": "contact@xyzinvest.com",
+          "uniqueId": "UTR1234567890",
+          "taxRate": 1,
+          "isPLC": false
+        }
+      },    {
+        "recordId": 2,
+        "transactionDetails": {
+          "transactionType": 2,
+          "reasonForPurchase": 2,
+          "typeOfSecurity": "Ordinary Shares",
+          "numberOfShares": 1000,
+          "nominalValue": 1.0,
+          "marketValue": 1500.00,
+          "qualifyAsTreasuryShares": false,
+          "maxPricePaid": 1.75,
+          "minPricePaid": 1.25,
+          "originalChargingPoint": "2026-04-01",
+          "considerationActual": 1500.00,
+          "isConnectedPartiesTransactions": false,
+          "companyName": "ABC Holdings Ltd",
+          "companyRegistrationNumber": "12345678",
+          "reliefClaimedName": "Some relief",
+          "reliefPercentage": 100
+        },
+        "mainSellerDetails": {
+          "sellerName": "Jane Doe",
+          "addr1": "45 Market Street",
+          "addr3": "Manchester",
+          "postcode": "M1 2AB",
+          "country": "GB"
+        },
+        "mainBuyerDetails": {
+          "buyerName": "XYZ Investments Ltd",
+          "addr1": "78 King Road",
+          "addr3": "London",
+          "postcode": "EC1A 1BB",
+          "country": "GB",
+          "email": "contact@xyzinvest.com",
+          "uniqueId": "UTR1234567890",
+          "taxRate": 1,
+          "isPLC": false
+        }
+      }
+    ]
+  }
+}
+
+tests {
+  test("Status code is 201", function () {
+    expect(res.getStatus()).to.equal(201);
+  });
+  
+  test("Response contains charge results", function () {
+    const body = res.getBody();
+    const success = body.success;
+    const charges = success.charges;
+  
+    expect(success).to.be.an("object");
+    expect(success.processingDate).to.exist;
+  
+    expect(charges).to.be.an("array");
+    expect(charges).to.have.length.greaterThan(0);
+  
+    expect(charges[0].recordId).to.equal(1);
+    expect(charges[0].utrn).to.exist;
+    expect(charges[0].chargeAmount).to.exist;
+  });
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

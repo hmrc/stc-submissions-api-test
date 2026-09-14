@@ -1,7 +1,7 @@
 meta {
-  name: Get Bearer Token
+  name: Get Bearer Token - Organisation
   type: http
-  seq: 0
+  seq: 2
 }
 
 post {
@@ -17,7 +17,7 @@ headers {
 body:json {
   {
     "credId": "test-cred-id",
-    "affinityGroup": "Individual",
+    "affinityGroup": "Organisation",
     "confidenceLevel": 50,
     "credentialStrength": "strong",
     "enrolments": [

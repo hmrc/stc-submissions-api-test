@@ -24,7 +24,7 @@ tests {
   test("Status code is 404", function () {
     expect(res.getStatus()).to.equal(404);
   });
-
+  
   test("Response contains URI not found message", function () {
     const body = res.getBody();
     expect(body.statusCode).to.equal(404);

@@ -1,7 +1,7 @@
 meta {
-  name: Submission 400 Invalid Json
+  name: Submission 200
   type: http
-  seq: 6
+  seq: 1
 }
 
 post {
@@ -20,6 +20,7 @@ body:json {
   {
     "declaration": {
       "role1": "1",
+      "name": "Declarant Name",
       "addr1": "123 Main Street",
       "postcode": "AB12CD",
       "country": "GB",
@@ -57,14 +58,24 @@ body:json {
 }
 
 tests {
-  test("Status code is 400", function () {
-    expect(res.getStatus()).to.equal(400);
+  test("Status code is 201", function () {
+    expect(res.getStatus()).to.equal(201);
   });
-
-  test("Response contains JSON validation error", function () {
+  
+  test("Response contains charge results", function () {
     const body = res.getBody();
-    expect(body.error).to.equal("invalid transfer data");
-    expect(body.details).to.be.an("array");
+    const success = body.success;
+    const charges = success.charges;
+  
+    expect(success).to.be.an("object");
+    expect(success.processingDate).to.exist;
+  
+    expect(charges).to.be.an("array");
+    expect(charges).to.have.length.greaterThan(0);
+  
+    expect(charges[0].recordId).to.equal(1);
+    expect(charges[0].utrn).to.exist;
+    expect(charges[0].chargeAmount).to.exist;
   });
 }
 

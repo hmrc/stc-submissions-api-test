@@ -1,7 +1,7 @@
 meta {
-  name: Submission 400 Duplicate RecordIds
+  name: Submission 400 Invalid Json
   type: http
-  seq: 5
+  seq: 6
 }
 
 post {
@@ -20,7 +20,6 @@ body:json {
   {
     "declaration": {
       "role1": "1",
-      "name": "Declarant Name",
       "addr1": "123 Main Street",
       "postcode": "AB12CD",
       "country": "GB",
@@ -52,32 +51,6 @@ body:json {
           "email": "buyer@example.com",
           "taxRate": 1
         }
-      },
-      {
-        "recordId": 1,
-        "transactionDetails": {
-          "transactionType": 2,
-          "typeOfSecurity": "Preference Shares",
-          "numberOfShares": 200,
-          "originalChargingPoint": "2026-02-20",
-          "considerationActual": 10000,
-          "isConnectedPartiesTransactions": false,
-          "companyName": "Another Corporation"
-        },
-        "mainSellerDetails": {
-          "sellerName": "Another Seller",
-          "addr1": "200 Seller Street",
-          "postcode": "CD34EF",
-          "country": "GB"
-        },
-        "mainBuyerDetails": {
-          "buyerName": "Another Buyer",
-          "addr1": "75 Buyer Avenue",
-          "postcode": "EF56GH",
-          "country": "GB",
-          "email": "another.buyer@example.com",
-          "taxRate": 2
-        }
       }
     ]
   }
@@ -87,11 +60,11 @@ tests {
   test("Status code is 400", function () {
     expect(res.getStatus()).to.equal(400);
   });
-
-  test("Response contains duplicate recordIds error", function () {
+  
+  test("Response contains JSON validation error", function () {
     const body = res.getBody();
     expect(body.error).to.equal("invalid transfer data");
-    expect(body.details[0].message).to.equal("recordIds must be unique");
+    expect(body.details).to.be.an("array");
   });
 }
 

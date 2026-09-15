@@ -37,39 +37,6 @@ class ServiceFactory @Inject() (client: HttpClientV2)(implicit ec: ExecutionCont
 
   def getBearerToken: Future[String] = authService.getBearerToken()
 
-  // Header constants
-  private object HeaderKeys {
-    val CorrelationId = "correlation-id"
-    val ContentType   = "Content-Type"
-    val JsonMimeType  = "application/json"
-  }
-
-  private def createHeaderCarrier(): HeaderCarrier = {
-    val correlationId = UUID.randomUUID().toString
-
-    val customHeaders = Seq(
-      HeaderKeys.CorrelationId -> correlationId,
-      HeaderKeys.ContentType   -> HeaderKeys.JsonMimeType
-    )
-
-    HeaderCarrier(
-      authorization = Some(Authorization("")),
-      extraHeaders = customHeaders
-    )
-  }
-
-  private def executeHttpRequest(url: String, requestBody: JsValue, requestType: String)(implicit
-    hc: HeaderCarrier = createHeaderCarrier()
-  ): Future[HttpResponse] = {
-    log.info(s"service factory url: $url")
-    log.info(s"service factory requestBody: $requestBody")
-    log.info(s"service factory requestType: $requestType")
-    log.info(s"service factory headerCarrier: $hc")
-    log.info(s"Sending $requestType request with payload: $requestBody")
-
-    client.post(URI.create(url).toURL).withBody(requestBody).execute[HttpResponse]
-  }
-
   def postSubmission(
     submissionId: String,
     payload: JsValue,
@@ -79,7 +46,6 @@ class ServiceFactory @Inject() (client: HttpClientV2)(implicit ec: ExecutionCont
     val correlationId              = UUID.randomUUID().toString
     val url                        = s"$submissionsBaseUrl/$submissionId"
     log.info(s"POST $url with correlation-id: $correlationId")
-    println("hello sathya")
     implicit val hc: HeaderCarrier = HeaderCarrier(
       authorization = Some(Authorization(s"Bearer $bearerToken")),
       extraHeaders = Seq(
@@ -100,7 +66,6 @@ class ServiceFactory @Inject() (client: HttpClientV2)(implicit ec: ExecutionCont
   ): Future[HttpResponse] = {
     val url                        = s"$submissionsBaseUrl/$submissionId"
     log.info(s"POST $url (no required headers)")
-    println("print please")
     implicit val hc: HeaderCarrier = HeaderCarrier(
       authorization = Some(Authorization(s"Bearer $bearerToken"))
     )

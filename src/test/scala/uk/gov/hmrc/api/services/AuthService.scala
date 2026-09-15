@@ -35,7 +35,6 @@ class AuthService(client: HttpClientV2)(implicit ec: ExecutionContext) {
   def getBearerToken(request: AuthStubRequest = AuthStubRequest()): Future[String] = {
     implicit val hc: HeaderCarrier = HeaderCarrier()
     log.info(s"Fetching bearer token from $authUrl")
-    println("hello tap")
     client
       .post(URI.create(authUrl).toURL)
       .withBody(Json.toJson(request))

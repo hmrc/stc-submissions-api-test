@@ -116,7 +116,6 @@ class SubmissionSpec extends BaseSpec with BeforeAndAfterAll {
         When("the request is sent")
         whenReady(request()) { response =>
           Then(s"the response status should be $expectedStatus")
-          println("Hello respond " + response)
           checkResponseStatus(response.status, expectedStatus)
         }
       }
